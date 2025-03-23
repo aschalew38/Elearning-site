@@ -1,0 +1,121 @@
+                  @if ($hasReacted)
+                            <div id="hearted">
+                                <a class="mb-0 px-0 py-1" href="#" id="liked">
+                                    <span class="ms-1">{{ $reactionCounter }}</span>
+                                    <input type="hidden" id="recipeId" value="{{ $recipe->id }}">
+                                    <img class="x1b0d499 xep6ejk" src="{{ asset('img/icons/icons8-blue-heart-25.png') }}">
+                                </a>
+                            </div>
+                             <div id="newHeartStatus"></div>
+                            @else
+                            <div id="unheart">
+                                <a class="mb-0 px-0 py-1" href="#" id="liked">
+                                    <span class="ms-1">{{ $reactionCounter }}</span>
+                                    <input type="hidden" id="recipeId" value="{{ $recipe->id }}">
+                                    <img class="x1b0d499 xep6ejk" src="{{ asset('img/icons/icons8-white-heart-25.png') }}">
+                                </a>
+                            </div>
+                            <div id="newHeartStatus"></div>
+                            @endif
+Ajax;
+
+  $(document).on('click','#liked',function(event){
+    event.preventDefault();
+    let recipeId = $("#recipeId").val();
+    $.ajax({
+        method: "POST",
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+        url : "{{ route('recipe.likes' , $recipe->id) }}",
+        data:{
+            'id': recipeId,
+        },
+        dataType: 'json',
+
+    success : function(response) {
+        if (response.success === true) {
+            Swal.fire({
+                toast: true,
+                icon: response.icon,
+                title: response.title,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true,
+            });
+            if(response.status === 'Liked'){
+                $("#unheart").remove();
+                var html = '<div id="hearted">';
+                    html += '<a class="mb-0 px-0 py-1" href="#" id="liked">';
+                    html += '<span class="ms-1">'+ response.count +'</span>';
+                    html += '<input type="hidden" id="recipeId" value="{{ $recipe->id }}">';
+                    html += '<img class="x1b0d499 xep6ejk" src="{{ asset("img/icons/icons8-blue-heart-25.png") }}">';
+                    html += '</a>';
+                    html += '</div>';
+                    html += '<div id="newHeartStatus"></div>';
+                $('#newHeartStatus').append(html);
+            }else{
+                $("#hearted").remove();
+                var html = '<div id="unheart">';
+                    html += '<a class="mb-0 px-0 py-1" href="#" id="liked">';
+                    html += '<span class="ms-1">'+ response.count +'</span>';
+                    html += '<input type="hidden" id="recipeId" value="{{ $recipe->id }}">';
+                    html += '<img class="x1b0d499 xep6ejk" src="{{ asset("img/icons/icons8-white-heart-25.png") }}">';
+                    html += '</a>';
+                    html += '</div>';
+                    html += '<div id="newHeartStatus"></div>';
+                $('#newHeartStatus').append(html);
+            }
+        }
+    },
+
+    fail: function(response) {
+        Swal.fire({
+            toast: true,
+            position: 'bottom-end',
+            showConfirmButton: false,
+            timer: 5000,
+            animation:true,
+            showCloseButton: true,
+            icon: 'error',
+            title: response.message
+        });
+    }
+    })
+})
+My Controller;
+
+     public function likes($id)
+{
+    $user = User::find(auth()->user()->id);
+    $recipe = Recipe::find($id);
+    $reacter = $user->viaLoveReacter();
+
+    if ($reacter->hasReactedTo($recipe, 'Like')) {
+        $reacter->unreactTo($recipe, 'Like');
+        $reactantFacade = $recipe->viaLoveReactant();
+        $reactionLikeCounter = $reactantFacade->getReactionCounterOfType('Like');
+
+        $response['success'] = true;
+        $response['status'] = 'Disliked';
+        $response['count'] = $reactionLikeCounter->count;
+        $response['title'] = "You have Disliked this recipe!";
+        $response['icon'] = "success";
+        return response()->json($response);
+
+    }else{
+        $reacter->reactTo($recipe, 'Like');
+        $reactantFacade = $recipe->viaLoveReactant();
+        $reactionLikeCounter = $reactantFacade->getReactionCounterOfType('Like');
+
+        $response['success'] = true;
+        $response['status'] = 'Liked';
+        $response['count'] = $reactionLikeCounter->count;
+        $response['title'] = "You have Liked this recipe!";
+        $response['icon'] = "success";
+        return response()->json($response);
+
+    }
+
+}
