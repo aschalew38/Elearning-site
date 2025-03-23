@@ -26,20 +26,21 @@ Exam Participation: Students can take online exams, with automated grading and f
 Admin: Full control over the system, including user course content and exam management.
 Student Keeper: take courses and get certified
 
-5. ### Financial Management:
+5. ### Roles & Responsibilities
+1. Student Role
+✔ Register & log in
+✔ Enroll in courses
+✔ Access learning materials
+✔ Take exams
+✔ Receive certifications
 
-Record credit and debit transactions.
-Notify users when payment due dates are reached.
-Customer & Supplier Management:
-Maintain detailed customer contact information.
-Store and manage supplier details for procurement tracking.
+2. Admin Role
+✔ Manage students & courses
+✔ Upload and organize course content
+✔ Create exams & assessments
+✔ Issue certifications
+✔ Track student progress
 
-6. ### Additional Functionalities:
-
-Secure authentication and user access control.
-Generate invoices and receipts for transactions.
-Export reports to various formats (PDF, Excel, CSV).
-Email and SMS notifications for stock alerts and payment reminders.
 
 ## Website link
 https://elearning.abajifartech.com
